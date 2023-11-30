@@ -62,7 +62,9 @@ relative_error = abs(cf(y, θ_max, t_f) - cf_fit(lmp, t_f)) / cf(y, θ_max, t_f)
 ### Advanced stuff
 
 If you want to plug in the process as noise in a differential equation you can use an SDE solver and integrate the Ornstein-Uhlenbeck processes along. The individual Ornstein-Uhlenbeck processes obey the SDE
+
 $$ \mathrm{d}x_k(t)=-\theta_k x_k(t)\mathrm{d}t+\sigma_k\mathrm{d}W_k(t), $$
+
 and the full process is just their sum
 $$X(t)=\sum_k x_k(t).$$
 The parameters $\sigma_k$, $\theta_k$ are fields of the `LongMemoryProcess` struct.
