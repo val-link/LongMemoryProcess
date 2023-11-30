@@ -3,12 +3,12 @@
 This repo contais a Julia script to generate realizations of a class of stationary Gaussian stochastic processes with extremely long memory.
 In detail the script can be used to generate realizations $X(t)$ of a real stationary Gaussian process with correlation function
 
-$$ \mathrm{cf}(t)=\mathcal{E}(X(t_0+t)X(t_0))=(\Gamma(y+1, 0)-\Gamma(y+1, \theta_\mathrm{max}t))\,(\theta_\mathrm{max}|t|)^{-y-1}$$
+$$ \mathrm{cf}(t)=\mathcal{E}(X(t_0+t)X(t_0))=(\Gamma(y+1, 0)-\Gamma(y+1, \theta_\mathrm{max}t)) (\theta_\mathrm{max}|t|)^{-y-1}$$
 
 with $\theta_\mathrm{max}>0$ and $y>-1$. $\Gamma$ is the incomplete gamma function. 
 The correlation function decays algebraically for large $t$ (heavy tailed)
 
-$$ \mathrm{cf}(t)\rightarrow \Gamma(y+1)\,(\theta_\mathrm{max}|t|)^{-y-1} .$$
+$$ \mathrm{cf}(t)\rightarrow \Gamma(y+1) (\theta_\mathrm{max}|t|)^{-y-1} .$$
 
 ## Theory
 Standard tools to generate stationary processes can become slow when the memory time is very large. The scheme that I use here approximates the true process as a finite sum of Ornstein-Uhlenbeck processes. This may be much more efficient than convolution in the time domain (as in ARFIMA(0,d,0)) or using a Fourier method.
@@ -20,7 +20,7 @@ $\theta_\mathrm{max}$ determines the fastest decay rate that we allow for and ca
 
 When we apply a numerical quadrature scheme to the integral it reduces to a finite sum over exponentials (in $t$)
 
-$$ \mathrm{cf}(t)\approx (\theta_\mathrm{max})^{-y-1}\sum_k w_k \,(\theta_k)^y \mathrm{e}^{-\theta_k |t|} $$
+$$ \mathrm{cf}(t)\approx (\theta_\mathrm{max})^{-y-1}\sum_k w_k (\theta_k)^y \mathrm{e}^{-\theta_k |t|} $$
 
 with weights $w_k$ and abscissas $\theta_k$.
 Exponentially decaying correlation functions are realized by a stationary Ornstein-Uhlenbeck process for which the transition probability is known analytically. Thus, the numerical quadrature scheme delivers an approximation of the process as a sum over a finite number of stationary Ornstein-Uhlenbeck processes. An efficient scheme for the diverging integrand is tanh-sinh quadrature (this is used in the code).
@@ -65,7 +65,7 @@ If you want to plug in the process as noise in a differential equation you can u
 $$ \mathrm{d}x_k(t)=-\theta_k x_k(t)\mathrm{d}t+\sigma_k\mathrm{d}W_k(t), $$
 and the full process is just their sum
 $$X(t)=\sum_k x_k(t).$$
-The parameters $\sigma_k,\,\theta_k$ are fields of the `LongMemoryProcess` struct.
+The parameters $\sigma_k$, $\theta_k$ are fields of the `LongMemoryProcess` struct.
 ```julia
 θ = lmp.θ; σ = lmp.σ;
 ```
