@@ -93,7 +93,7 @@ end
 function LongMemoryProcess(y::Float64, θ_max::Float64; n::Int64=401)
     @assert y > -1 "y must be larger than -1."
     h = 4.6 / floor(n / 2)
-    #kmax=Int(floor(4.6/h)) # 4.6 this is the upper limit for using standard BigFloat accuracy. This is fine for Y > -0.95.
+    # 4.6 this is the upper limit for using standard BigFloat accuracy. This is fine for Y > -0.95.
     k = collect(-Int(floor(n / 2)):Int(floor(n / 2 - 1 / 2)))
     th = TanhSinhQuad(h, k)
     return LongMemoryProcess(th, y, θ_max)
