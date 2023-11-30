@@ -3,7 +3,7 @@
 This repo contais a Julia script to generate realizations of a class of stationary Gaussian stochastic processes with extremely long memory.
 In detail the script can be used to generate realizations $X(t)$ of a real stationary Gaussian process with correlation function
 
-$$ \mathrm{cf}(t)=\mathcal{E}(X(t_0+t)X(t_0))=(\Gamma(y+1, 0)-\Gamma(y+1, \theta_\mathrm{max}t)) (\theta_\mathrm{max}|t|)^{-y-1}$$
+$$ \mathrm{cf}(t)=\mathcal{E}(X(t_0+t)X(t_0))=(\Gamma(y+1, 0)-\Gamma(y+1, \theta_\mathrm{max}|t|)) (\theta_\mathrm{max}|t|)^{-y-1}$$
 
 with $\theta_\mathrm{max}>0$ and $y>-1$. $\Gamma$ is the incomplete gamma function. 
 The correlation function decays algebraically for large $t$ (heavy tailed)
