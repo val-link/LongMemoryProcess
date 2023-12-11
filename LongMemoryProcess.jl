@@ -2,7 +2,7 @@ import SpecialFunctions.gamma
 
 
 """
-    stationary_ornstein_uhlenbeck_realization(θ::Vector{Float64}, σ::Vector{Float64}, t::Vector{Float64}) -> Vector{Float64}
+    stationary_ornstein_uhlenbeck_realization(θ::Vector{Float64}, σ::Vector{Float64}, t::Vector{<:Number})
 Generate a realization of a stationary Gaussian stochastic which is the sum of `N = length(θ)` real independent Ornstein-Uhlenbeck processes (with parameters `θ`, `σ`) evaluated at times `t`.
 
 
@@ -11,7 +11,7 @@ Returns a realization of the process evaluated at times `t`
 
 It is also possible to additionally return the values of the individual processes at the final time by setting the optional argument `return_full=true`
 """
-function stationary_ornstein_uhlenbeck_realization(θ::Vector{Float64}, σ::Vector{Float64}, t::Vector{Float64}; return_full::Bool=false)
+function stationary_ornstein_uhlenbeck_realization(θ::Vector{Float64}, σ::Vector{Float64}, t::Vector{<:Number}; return_full::Bool=false)
     @assert length(θ) == length(σ) "σ and θ do not have the same length"
     @assert all(θ .>= 0) "θ has negative entries"
     @assert all(σ .>= 0) "σ has negative entries"
@@ -53,7 +53,7 @@ end
 
 
 """
-    LongMemoryProcess(y::Float64, θ_max::Float64; n::Int64=401)
+    LongMemoryProcess(y::AbstractFloat, θ_max::Number; n::Int=401)
 `LongMemoryProcess` can generate a class of stationary Gaussian processes with long memory algebraically decaying correlations. `y` must be larger than -1.
 The correlation function of the process cf(t) = E(X(t)X(0)) is given as
 
@@ -78,11 +78,11 @@ You can check the fitting accuracy by comparing the true correlation function wi
 """
 mutable struct LongMemoryProcess
     th::TanhSinhQuad
-    y::Float64
+    y::AbstractFloat
     θ::Vector{Float64}
     σ::Vector{Float64}
 end
-function LongMemoryProcess(th::TanhSinhQuad, y::Float64, θ_max::Float64)
+function LongMemoryProcess(th::TanhSinhQuad, y::AbstractFloat, θ_max::Number)
     @assert y > -1 "y must be larger than -1"
     f(x) = x^y
     g = Float64.(@. th.w / θ_max^y * 0.5 * f((th.x + 1) / 2 * θ_max))
@@ -90,36 +90,36 @@ function LongMemoryProcess(th::TanhSinhQuad, y::Float64, θ_max::Float64)
     σ = sqrt.(2 * θ .* g)
     return LongMemoryProcess(th, y, θ, σ)
 end
-function LongMemoryProcess(y::Float64, θ_max::Float64; n::Int64=401)
+function LongMemoryProcess(y::AbstractFloat, θ_max::Number; n::Int=401)
     @assert y > -1 "y must be larger than -1."
     h = 4.6 / floor(n / 2)
     # 4.6 this is the upper limit for using standard BigFloat accuracy. This is fine for Y > -0.95.
     k = collect(-Int(floor(n / 2)):Int(floor(n / 2 - 1 / 2)))
-    th = TanhSinhQuad(h, k)
+    th = TanhSinhQuad(Float64(h), k)
     return LongMemoryProcess(th, y, θ_max)
 end
-function (proc::LongMemoryProcess)(t::Vector{Float64}; return_full=false)
+function (proc::LongMemoryProcess)(t::Vector{<:Number}; return_full=false)
     return stationary_ornstein_uhlenbeck_realization(proc.θ, proc.σ, t; return_full=return_full)
 end
 
 
 """
-    cf_fit(proc::LongMemoryProcess, t::Float64) -> Float64
+    cf_fit(proc::LongMemoryProcess, t::Number)
 The fitted correlation function of the process 'proc' evaluated at time 't'.
 """
-function cf_fit(σ::Vector{Float64}, θ::Vector{Float64}, t::Float64)
+function cf_fit(σ::Vector{Float64}, θ::Vector{Float64}, t::Number)
     return sum(@. σ^2 / (2 * θ) * exp(-θ * abs(t)))
 end
-function cf_fit(proc::LongMemoryProcess, t::Float64)
-    return cf_fit(proc.σ::Vector{Float64}, proc.θ::Vector{Float64}, t::Float64)
+function cf_fit(proc::LongMemoryProcess, t::Number)
+    return cf_fit(proc.σ, proc.θ, t)
 end
 
 
 """
-    cf(y::Float64, θ_max::Float64, t::Float64) -> Float64
+    cf(y::AbstractFloat, θ_max::Number, t::Number)
 The function 
     cf(y, θ_max, t) = (Γ(y + 1, 0) - Γ(y + 1, θ_max t)) / t^(y + 1)
 """
-function cf(y::Float64, θ_max::Float64, t::Float64)
+function cf(y::AbstractFloat, θ_max::Number, t::Number)
     return (gamma(y + 1, 0.0) - gamma(y + 1, θ_max * t)) / (θ_max * t)^(y + 1)
 end
